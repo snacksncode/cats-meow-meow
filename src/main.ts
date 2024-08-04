@@ -3,6 +3,7 @@ import "./style.css";
 const container = document.querySelector("#container")!;
 const pageWidth = window.innerWidth;
 const pageHeight = window.innerHeight;
+let loadedImagesCount = 0;
 
 if (container == null) throw Error("element with id container is missing. Please add it.");
 
@@ -13,17 +14,7 @@ function getRandomIntInclusive(min: number, max: number) {
 }
 
 async function getImages() {
-  const info = document.createElement("div");
-  info.style.color = "gray";
-
-  const text = document.createTextNode(`collecting cat images...`);
-  info.appendChild(text);
-  container.appendChild(info);
-
-  const raw = await fetch("https://api.thecatapi.com/v1/images/search");
-
-  info.style.color = "lightgreen";
-
+  const raw = await fetch(`https://api.thecatapi.com/v1/images/search?limit=10`);
   const data = (await raw.json()) as { url: string }[];
   const urls = data.map((i) => i.url);
   return urls;
@@ -49,17 +40,41 @@ function spawnCat(x: number, y: number, images: string[], size = 90) {
 
 async function main() {
   container.innerHTML =
-    "<span style='color: lightcoral; margin-bottom: 2rem; font-size: 2rem;'>Loading images...</span>";
+    "<span style='color: lightcoral; margin-bottom: 1rem; font-size: 2rem;'>Loading images...</span>";
 
+  const info = document.createElement("div");
+  info.style.color = "#eeeeee";
+
+  const FETCH_CALLS = 10;
+
+  const text = document.createTextNode(`collecting cat images (0 / ${FETCH_CALLS})...`);
+  info.appendChild(text);
+  container.appendChild(info);
+
+  let successfulCallCount = 0;
   const catImages = await Promise.all(
-    Array.from({ length: 5 }).map(async () => {
-      return await getImages();
+    Array.from({ length: FETCH_CALLS }).map(async () => {
+      const images = await getImages();
+      successfulCallCount++;
+      info.innerHTML = `collecting cat images (${successfulCallCount} / ${FETCH_CALLS})...`;
+      return images;
     })
   ).then((values) => {
     return values.flat();
   });
 
-  container.innerHTML = "<span style='color: lightgreen'>Loaded! Now click!</span>";
+  catImages.map((url) => {
+    const image = new Image();
+    image.src = url;
+    image.onload = () => {
+      loadedImagesCount++;
+      if (loadedImagesCount === catImages.length) {
+        container.innerHTML = "<span style='color: lightgreen'>Loaded! Now click!</span>";
+      } else {
+        info.innerHTML = `preloading cat images (${loadedImagesCount} / ${catImages.length})...`;
+      }
+    };
+  });
 
   let initialClick = true;
 
