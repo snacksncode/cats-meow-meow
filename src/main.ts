@@ -112,7 +112,6 @@ async function main() {
   //listeners
   document.addEventListener("contextmenu", (e) => e.preventDefault());
   document.addEventListener("click", processClick);
-  document.addEventListener("touchstart", processClick);
 }
 
 main();
