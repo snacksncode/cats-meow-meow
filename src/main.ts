@@ -20,11 +20,22 @@ async function getImages() {
   return urls;
 }
 
+const __catsRefs: HTMLDivElement[] = [];
+const THRESHOLD = 500;
+
 function spawnCat(x: number, y: number, images: string[], size = 90) {
+  if (__catsRefs.length > THRESHOLD) {
+    const lastCat = __catsRefs.shift();
+    if (!lastCat) return;
+    lastCat.classList.remove("show");
+    setTimeout(() => lastCat.remove(), 250);
+  }
+
   const randomIndex = getRandomIntInclusive(0, images.length - 1);
   const randomCatImage = images[randomIndex];
 
   const cat = document.createElement("div");
+  __catsRefs.push(cat);
   cat.style.backgroundImage = "url('" + randomCatImage + "')";
   cat.classList.add("img");
 
