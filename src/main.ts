@@ -100,7 +100,7 @@ async function main() {
 
     spawnCat(clickedX, clickedY, catImages);
 
-    const additionalCatsCount = Math.floor((e.view?.innerWidth ?? pageWidth) / 400);
+    const additionalCatsCount = Math.ceil((e.view?.innerWidth ?? pageWidth) / 250);
 
     for (let i = 0; i < additionalCatsCount; i++) {
       const randomX = getRandomIntInclusive(0, e.view?.innerWidth ?? pageWidth);

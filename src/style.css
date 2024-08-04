@@ -51,3 +51,8 @@ body {
 .show {
   opacity: 1;
 }
+
+/* prevent double tap zoom on mobile */
+* {
+  touch-action: manipulation;
+}
