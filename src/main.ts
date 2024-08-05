@@ -74,12 +74,14 @@ async function main() {
     return values.flat();
   });
 
+  let allImagesLoaded = false;
   catImages.map((url) => {
     const image = new Image();
     image.src = url;
     image.onload = () => {
       loadedImagesCount++;
       if (loadedImagesCount === catImages.length) {
+        allImagesLoaded = true;
         container.innerHTML = "<span style='color: lightgreen'>Loaded! Now click!</span>";
       } else {
         info.innerHTML = `preloading cat images (${loadedImagesCount} / ${catImages.length})...`;
@@ -90,6 +92,7 @@ async function main() {
   let initialClick = true;
 
   const processClick = (e: MouseEvent | TouchEvent) => {
+    if (!allImagesLoaded) return;
     if (initialClick) {
       container.innerHTML = "";
       initialClick = false;
